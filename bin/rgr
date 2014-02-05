@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require "rgr"
+
+search_query = ARGV.shift or abort "Usage: rgr <search_query> <files...>"
+
+reporter = Rgr.reporter.new
+
+files =
+  if ARGV.any?
+    ARGV
+  else
+    Dir["**/*.rb"]
+  end
+
+Rgr.search(search_query, files).each do |file, matches|
+  reporter.report_file_matches(file, matches)
+end

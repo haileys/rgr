@@ -6,13 +6,13 @@ if ARGV.empty?
 end
 
 reporter = Rgr.reporter.new
-globber = Rgr::Globber.new
+ignore_prefixes = []
 
 loop do
   case option = ARGV.shift
   when "--ignore"
     prefix = ARGV.shift or abort "Expected path after --ignore"
-    globber.ignore_prefix(prefix)
+    ignore_prefixes << prefix
   else
     # not an option, put it back
     ARGV.unshift(option)
@@ -21,10 +21,7 @@ loop do
 end
 
 search_query = ARGV.shift
-
-ARGV.each do |path|
-  globber.add_path(path)
-end
+globber      = Rgr::Globber.new paths: ARGV, ignore_prefixes: ignore_prefixes
 
 Rgr.search(search_query, globber.each_file).each do |file, matches|
   reporter.report_file_matches(file, matches)

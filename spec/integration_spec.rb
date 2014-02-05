@@ -15,7 +15,7 @@ describe 'Integration tests' do
                                                 "-S", "#{root_path}/bin/rgr",
                                                 "_.zomg")
     # no errors
-    expect(invocation.stderr).to be_empty
+    expect(invocation.stderr).to eq ""
 
     # lists the path
     expect(invocation.stdout).to include "spec/integration_spec.rb"

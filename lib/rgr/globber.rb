@@ -2,9 +2,11 @@ module Rgr
   class Globber
     attr_reader :paths, :ignored_prefixes
 
-    def initialize
-      @paths = []
-      @ignored_prefixes = []
+    def initialize(options={})
+      options = options.dup
+      @paths            = options.delete(:paths)           { [] }
+      @ignored_prefixes = options.delete(:ignore_prefixes) { [] }
+      options.any? && raise(ArgumentError, "Unknown keys: #{options.keys.inspect}")
     end
 
     def add_path(path)

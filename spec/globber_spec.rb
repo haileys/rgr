@@ -14,9 +14,7 @@ describe Rgr::Globber do
   def glob(*paths)
     ignore_prefixes = []
     ignore_prefixes = Array(paths.pop.fetch :ignore) if paths.last.kind_of? Hash
-    globber         = described_class.new
-    paths.each           &globber.method(:add_path)
-    ignore_prefixes.each &globber.method(:ignore_prefix)
+    globber         = described_class.new paths: paths, ignore_prefixes: ignore_prefixes
     globber.each_file.to_a
   end
 
@@ -37,6 +35,11 @@ describe Rgr::Globber do
     # files to find or not find depending on ignore
     touch 'dir1/match.rb'
     touch 'dir2/match.rb'
+  end
+
+  it 'raises an ArgumentError if given an invalid key' do
+    described_class.new paths: [], ignore_prefixes: []
+    expect { described_class.new abc: [] }.to raise_error ArgumentError, /:abc/
   end
 
   it 'finds all files that end with .rb recursively within its list of paths' do

@@ -18,7 +18,7 @@ describe 'Integration tests' do
     expect(invocation.stderr).to be_empty
 
     # lists the path
-    expect(invocation.stdout).to include "spec/smoke_spec.rb"
+    expect(invocation.stdout).to include "spec/integration_spec.rb"
 
     # lists the line
     expect(invocation.stdout).to include "abc.zomg"

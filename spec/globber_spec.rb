@@ -37,6 +37,10 @@ describe Rgr::Globber do
     touch 'dir2/match.rb'
   end
 
+  # untested behaviour: defaults to Dir['**/*.rb']
+  # didn't add a test for it b/c I'd rather remove it, just not sure how atm
+  # maybe globber should strip leading "./"
+
   it 'raises an ArgumentError if given an invalid key' do
     described_class.new paths: [], ignore_prefixes: []
     expect { described_class.new abc: [] }.to raise_error ArgumentError, /:abc/

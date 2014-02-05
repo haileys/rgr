@@ -10,9 +10,9 @@ module Rgr
     def each_file
       return enum_for(:each_file) unless block_given?
 
-      unfiltered_files.each do |file|
-        next if ignored?(file)
-        yield file
+      unfiltered_file_names.each do |file_name|
+        next if ignored?(file_name)
+        yield file_name
       end
     end
 
@@ -20,24 +20,22 @@ module Rgr
 
     attr_accessor :paths, :ignored_prefixes
 
-
-    def ignored?(file)
-      ignored_prefixes.any? { |prefix|
-        file.start_with?(prefix)
-      }
+    def ignored?(file_name)
+      ignored_prefixes.any? { |prefix| file_name.start_with? prefix }
     end
 
-    def unfiltered_files
+    def unfiltered_file_names
       if paths.empty?
+        # Ideally, this would be passed in
+        # but that changes behaviour, b/c what path can you pass in to do this?
+        # if passing ".", then all paths are prefixed with "./"
         Dir["**/*.rb"]
       else
-        paths.flat_map { |path|
-          glob_path(path)
-        }
+        paths.flat_map { |path| glob path }
       end
     end
 
-    def glob_path(path)
+    def glob(path)
       if File.file?(path)
         [path]
       else

@@ -15,7 +15,7 @@ module Rgr
 
       matches.each do |match|
         expr = match.expression
-        highlighted_source = highlight_source(expr.source)
+        highlighted_source = highlight_source(expr.source_line)
         output.printf "\e[33;1m%#{line_number_places}d\e[0m: %s\n", expr.line, highlighted_source
       end
     end

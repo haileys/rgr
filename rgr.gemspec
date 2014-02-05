@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "rgr"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.summary = "Ruby Grep"
   s.description = "Grep tool for large Ruby codebases"

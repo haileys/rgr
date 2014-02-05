@@ -8,7 +8,7 @@ module Rgr
 
     def report_file_matches(file, matches)
       matches.each do |match|
-        puts "#{match.expression}: #{match.expression.source}"
+        output.puts "#{match.expression}: #{match.expression.source}"
       end
     end
   end

@@ -7,36 +7,59 @@ describe Rgr::Globber do
 
   around :each do |spec|
     Dir.mktmpdir do |temp_dir|
-      Dir.chdir temp_dir do
-        spec.call
-      end
+      Dir.chdir temp_dir, &spec
     end
   end
 
   def glob(*paths)
-    globber = described_class.new
-    paths.each &globber.method(:add_path)
+    ignore_prefixes = []
+    ignore_prefixes = Array(paths.pop.fetch :ignore) if paths.last.kind_of? Hash
+    globber         = described_class.new
+    paths.each           &globber.method(:add_path)
+    ignore_prefixes.each &globber.method(:ignore_prefix)
     globber.each_file.to_a
   end
 
-  it 'finds all files that end with .rb recursively within its list of paths' do
-    touch 'current_dir.rb'
+  before do
+    # dir structure
     mkdir 'dir1/'
-    touch 'dir1/does_not_end_in_dot_rb'
-    touch 'dir1/ends_in_dot.rb'
     mkdir 'dir1/subdir1/'
+    mkdir 'dir2/'
+
+    # nested files to find
+    touch 'current_dir.rb'
+    touch 'dir1/ends_in_dot.rb'
     touch 'dir1/subdir1/deep_file.rb'
 
-    found_files = glob '.'
+    # file to not find b/c invalid name
+    touch 'dir1/does_not_end_in_dot_rb'
 
-    expect(found_files.size).to eq 3
-    expect(found_files).to include './current_dir.rb'
-    expect(found_files).to include './dir1/ends_in_dot.rb'
-    expect(found_files).to include './dir1/subdir1/deep_file.rb'
-
-    # kinda redundant, given we checked the size, but nice to be explicit
-    expect(found_files).to_not include 'dir1/does_not_end_in_dot_rb'
+    # files to find or not find depending on ignore
+    touch 'dir1/match.rb'
+    touch 'dir2/match.rb'
   end
 
-  it 'omits results that start with one of its ignored prefixes'
+  it 'finds all files that end with .rb recursively within its list of paths' do
+    found_files = glob '.'
+    expect(found_files).to     include './current_dir.rb'
+    expect(found_files).to     include './dir1/ends_in_dot.rb'
+    expect(found_files).to     include './dir1/subdir1/deep_file.rb'
+    expect(found_files).to_not include './dir1/does_not_end_in_dot_rb'
+  end
+
+  it 'can glob a different path than CWD' do
+    found_files = glob './dir1'
+    expect(found_files).to     include './dir1/ends_in_dot.rb'
+    expect(found_files).to_not include './current_dir.rb'
+  end
+
+  it 'omits results that start with one of its ignored prefixes' do
+    found_files = glob '.'
+    expect(found_files).to include './dir1/match.rb'
+    expect(found_files).to include './dir2/match.rb'
+
+    found_files = glob '.', ignore: './dir2'
+    expect(found_files).to     include './dir1/match.rb'
+    expect(found_files).to_not include './dir2/match.rb'
+  end
 end

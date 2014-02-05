@@ -1,17 +1,31 @@
 #!/usr/bin/env ruby
 require "rgr"
 
-search_query = ARGV.shift or abort "Usage: rgr <search_query> <files...>"
+if ARGV.empty?
+  abort "Usage: rgr [<options>] <search_query> <files...>"
+end
 
 reporter = Rgr.reporter.new
+globber = Rgr::Globber.new
 
-files =
-  if ARGV.any?
-    ARGV
+loop do
+  case option = ARGV.shift
+  when "--ignore"
+    prefix = ARGV.shift or abort "Expected path after --ignore"
+    globber.ignore_prefix(prefix)
   else
-    Dir["**/*.rb"]
+    # not an option, put it back
+    ARGV.unshift(option)
+    break
   end
+end
 
-Rgr.search(search_query, files).each do |file, matches|
+search_query = ARGV.shift
+
+ARGV.each do |path|
+  globber.add_path(path)
+end
+
+Rgr.search(search_query, globber.each_file).each do |file, matches|
   reporter.report_file_matches(file, matches)
 end

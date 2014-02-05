@@ -1,20 +1,10 @@
 module Rgr
   class Globber
-    attr_reader :paths, :ignored_prefixes
-
     def initialize(options={})
-      options = options.dup
-      @paths            = options.delete(:paths)           { [] }
-      @ignored_prefixes = options.delete(:ignore_prefixes) { [] }
+      options               = options.dup
+      self.paths            = options.delete(:paths)           { [] }
+      self.ignored_prefixes = options.delete(:ignore_prefixes) { [] }
       options.any? && raise(ArgumentError, "Unknown keys: #{options.keys.inspect}")
-    end
-
-    def add_path(path)
-      paths << path
-    end
-
-    def ignore_prefix(prefix)
-      ignored_prefixes << prefix
     end
 
     def each_file
@@ -25,6 +15,11 @@ module Rgr
         yield file
       end
     end
+
+    private
+
+    attr_accessor :paths, :ignored_prefixes
+
 
     def ignored?(file)
       ignored_prefixes.any? { |prefix|

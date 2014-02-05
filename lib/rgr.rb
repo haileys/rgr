@@ -1,6 +1,7 @@
-require "rgr/searcher"
 require "rgr/coloured_reporter"
+require "rgr/globber"
 require "rgr/plain_reporter"
+require "rgr/searcher"
 
 module Rgr
   def self.search(search_term, files)
